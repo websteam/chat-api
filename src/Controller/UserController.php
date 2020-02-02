@@ -21,7 +21,7 @@ class UserController extends AbstractController
     /**
      * @Route("/user", name="user")
      */
-    public function index()
+    public function index(): JsonResponse
     {
         return $this->json([
             'message' => 'Welcome to your new controller!',
@@ -32,7 +32,7 @@ class UserController extends AbstractController
     /**
      * @Route("/user/login", name="login", methods={"POST"})
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -42,6 +42,6 @@ class UserController extends AbstractController
 
         $user = $this->userRepository->loginOrCreate($data['email']);
 
-        return new JsonResponse($user->toArray());
+        return $this->json($user);
     }
 }

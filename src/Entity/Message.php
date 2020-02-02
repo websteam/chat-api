@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MessageRepository")
  */
-class Message
+class Message implements JsonSerializable
 {
+    public function __construct()
+    {
+        $this->setCreated(new DateTime());
+    }
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -22,11 +29,6 @@ class Message
     private $content;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $user_id;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -35,6 +37,12 @@ class Message
      * @ORM\Column(type="integer")
      */
     private $room_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="messages")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -49,18 +57,6 @@ class Message
     public function setContent(string $content): self
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
 
         return $this;
     }
@@ -89,12 +85,24 @@ class Message
         return $this;
     }
 
-    public function toArray()
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function jsonSerialize()
     {
         return [
             'id' => $this->getId(),
             'content' => $this->getContent(),
-            'user_id' => $this->getUserId(),
+            'user' => $this->getUser(),
             'room_id' => $this->getRoomId(),
             'created' => $this->getCreated()
         ];

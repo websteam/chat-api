@@ -19,6 +19,19 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
+    public function create($content, $userId, $roomId): Message
+    {
+        $message = new Message();
+        $message->setContent($content);
+        $message->setUser($userId);
+        $message->setRoomId($roomId);
+
+        $this->getEntityManager()->persist($message);
+        $this->getEntityManager()->flush();
+
+        return $message;
+    }
+
     // /**
     //  * @return Message[] Returns an array of Message objects
     //  */
