@@ -39,6 +39,21 @@ class User implements JsonSerializable
      */
     private $messages;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $token;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $is_logged;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $refresh_token;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -116,13 +131,51 @@ class User implements JsonSerializable
         return $this;
     }
 
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getIsLogged(): ?bool
+    {
+        return $this->is_logged;
+    }
+
+    public function setIsLogged(?bool $is_logged): self
+    {
+        $this->is_logged = $is_logged;
+
+        return $this;
+    }
+
+    public function getRefreshToken(): ?string
+    {
+        return $this->refresh_token;
+    }
+
+    public function setRefreshToken(?string $refresh_token): self
+    {
+        $this->refresh_token = $refresh_token;
+
+        return $this;
+    }
+
     public function jsonSerialize()
     {
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'email' => $this->getEmail(),
-            'last_login' => $this->getLastLogin()
+            'last_login' => $this->getLastLogin(),
+            'token' => $this->getToken(),
+            'refresh_token' => $this->getRefreshToken()
         ];
     }
 }

@@ -19,14 +19,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user", name="user")
+     * @Route("/user", name="user", methods={"GET"})
      */
     public function index(): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
-        ]);
+        $users = $this->userRepository->findAll();
+
+        return $this->json($users);
     }
 
     /**
@@ -40,8 +39,17 @@ class UserController extends AbstractController
             throw new BadRequestHttpException('Email parameter is mandatory');
         }
 
+        // Logging in using email creates new user or returns one from database
         $user = $this->userRepository->loginOrCreate($data['email']);
 
         return $this->json($user);
+    }
+
+    /**
+     * @Route("/user/refresh_token", name="refresh_token")
+     */
+    public function refreshToken(Request $request): JsonResponse
+    {
+        return $this->json('test');
     }
 }

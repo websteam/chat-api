@@ -6,7 +6,7 @@ use App\Entity\User;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
+use Ahc\Jwt\JWT;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -41,6 +41,17 @@ class UserRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
 
+        if (empty($user->getRefreshToken())) {
+            $this->refreshToken($user);
+        }
+
+        $jwt = new JWT($user->getRefreshToken(), 'HS256', 3600, 10);
+
+        $user->setToken($jwt->encode([
+            'uid'    => $user->getId(),
+            'scopes' => ['user'],
+        ]));
+
         return $user;
     }
 
@@ -53,35 +64,28 @@ class UserRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
 
+        $this->refreshToken($user);
+
         return $user;
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function refreshToken(User $user): User
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $user->setRefreshToken($this->_createRefreshToken($user));
 
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
+
+        return $user;
     }
-    */
+
+    private function _createRefreshToken(User $user): string
+    {
+        $jwt = new JWT($_ENV['APP_SECRET'], 'HS256');
+
+        return $jwt->encode([
+            'uid'    => $user->getId(),
+            'scopes' => ['user'],
+        ]);
+    }
 }
