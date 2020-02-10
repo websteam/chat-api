@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Message;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

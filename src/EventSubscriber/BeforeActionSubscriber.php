@@ -15,6 +15,7 @@ class BeforeActionSubscriber implements EventSubscriberInterface
     {
         return array(
             KernelEvents::CONTROLLER => 'convertJsonStringToArray',
+            KernelEvents::CONTROLLER => 'checkJwtToken'
         );
     }
 
